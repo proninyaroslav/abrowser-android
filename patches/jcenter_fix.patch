@@ -1,0 +1,13 @@
+--- a/mobile/android/gradle.configure	2018-10-27 22:51:45.000000000 +0300
++++ b/mobile/android/gradle.configure	2018-10-31 19:17:38.907669020 +0300
+@@ -293,8 +293,8 @@
+ # Local developer default is (jcenter, maven.google.com).
+ option(env='GRADLE_MAVEN_REPOSITORIES',
+        nargs='+',
+-       default=('https://jcenter.bintray.com/',
+-                'https://maven.google.com/',
++       default=('https://maven.google.com/',
++                'https://jcenter.bintray.com/',
+        ),
+        help='Comma-separated URLs of Maven repositories containing Gradle dependencies.')
+ 

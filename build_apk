@@ -1,0 +1,93 @@
+#!/bin/bash
+#
+#    Copyright (C) 2018 Yaroslav Pronin <proninyaroslav@mail.ru>
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+#
+
+# Build steps
+#
+#  1. Run script, source tarball will be downloaded and
+#     unpacked automatically. You can edit it for your needs.
+#  2. Follow the steps of the build system; choose
+#     "3. Firefox for Android Artifact Mode" when prompted.
+#  3. Generated APK will be located in BUILD_DIR/obj-droid/dist.
+
+BASE_URL="http://archive.trisquel.info/trisquel/pool/main/f/firefox/"
+TAR_NAME="firefox_63.0+build2-0ubuntu0.16.04.2+8.0trisquel59.tar.gz"
+BUILD_DIR=build
+
+# For building
+OBJ_DIR=objdir-droid
+ARCH=arm-linux-androideabi
+# Uncomment for x86 build
+ARCH=i386-linux-android
+
+if [ ! -d $BUILD_DIR ]; then
+	mkdir $BUILD_DIR
+	wget "$BASE_URL$TAR_NAME" && \
+	tar zxf $TAR_NAME -C $BUILD_DIR --strip-components 1 && \
+	rm $TAR_NAME
+fi
+cd $BUILD_DIR
+
+# Remove previous build
+if [ -d $OBJ_DIR ]; then
+	rm -rf $OBJ_DIR
+fi
+
+# Patches
+for p in debian/patches/*
+do
+	patch -Np1 -i $p
+done
+
+for p in ../patches/*
+do
+	patch -Np1 -i $p
+done
+
+./mach bootstrap
+
+# Mozconfig
+cat > mozconfig <<END
+# Build Firefox for Android:
+export MOZ_INSTALL_TRACKING=
+export MOZ_NATIVE_DEVICES=
+ac_add_options --enable-application=mobile/android
+ac_add_options --target=$ARCH
+
+# With the following Android SDK and NDK:
+ac_add_options --with-android-sdk="$HOME/.mozbuild/android-sdk-linux"
+ac_add_options --with-android-ndk="$HOME/.mozbuild/android-ndk-r15c"
+
+# Write build artifacts to:
+mk_add_options MOZ_OBJDIR="./$OBJ_DIR"
+
+# Build options
+ac_add_options --enable-official-branding
+ac_add_options --with-distribution-id=org.gnu
+ac_add_options --disable-elf-hack
+ac_add_options --enable-warnings-as-errors
+ac_add_options --enable-dump-painting
+
+# Use ccache
+ac_add_options --with-ccache
+# Your CPU cores + 1
+mk_add_options MOZ_MAKE_FLAGS=-j7
+
+END
+
+./mach build && ./mach package
