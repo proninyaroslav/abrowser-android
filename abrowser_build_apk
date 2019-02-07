@@ -120,19 +120,19 @@ mk_add_options MOZ_MAKE_FLAGS=-j$(($CPU_CORES + 1))
 END
 
 if [ $ARCH != "aarch64-linux-android" ]; then
-cat <<EOT >> mozconfig
+cat <<END >> mozconfig
 # Remove for ARM64
 ac_add_options --disable-elf-hack
 
-EOT
+END
 fi
 
 if [[ $NDK_VER == *"r17"* ]]; then
-cat <<EOT >> mozconfig
+cat <<END >> mozconfig
 # For NDK r17
 export LDFLAGS="-Wno-error=tautological-constant-compare"
 
-EOT
+END
 fi
 
 ./mach build && ./mach package
