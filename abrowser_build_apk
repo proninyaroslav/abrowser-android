@@ -20,13 +20,12 @@
 # Build steps
 #
 #  1. Read comments in this script and change it
-#     (including mozconfig template) for the selected
-#     build target (ARM, ARM64, x86, x86_64).
-#  1. Run script, source tarball will be downloaded and
+#     for the selected build target (ARM, ARM64, x86, x86_64).
+#  2. Run script, source tarball will be downloaded and
 #     unpacked automatically.
-#  2. Follow the steps of the build system; choose
+#  3. Follow the steps of the build system; choose
 #     "3. Abrowser for Android Artifact Mode" when prompted.
-#  3. Generated APK will be located in BUILD_DIR/obj-droid/dist.
+#  4. Generated APK will be located in BUILD_DIR/obj-droid/dist.
 
 BASE_URL="http://archive.trisquel.info/trisquel/pool/main/f/firefox/"
 TAR_NAME="firefox_64.0+build3-0ubuntu0.16.04.1+8.0trisquel60.tar.gz"
