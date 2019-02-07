@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#    Copyright (C) 2018 Yaroslav Pronin <proninyaroslav@mail.ru>
+#    Copyright (C) 2018, 2019 Yaroslav Pronin <proninyaroslav@mail.ru>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -19,21 +19,45 @@
 
 # Build steps
 #
+#  1. Read comments in this script and change it
+#     (including mozconfig template) for the selected
+#     build target (ARM, ARM64, x86, x86_64).
 #  1. Run script, source tarball will be downloaded and
-#     unpacked automatically. You can edit it for your needs.
+#     unpacked automatically.
 #  2. Follow the steps of the build system; choose
-#     "3. Firefox for Android Artifact Mode" when prompted.
+#     "3. Abrowser for Android Artifact Mode" when prompted.
 #  3. Generated APK will be located in BUILD_DIR/obj-droid/dist.
 
 BASE_URL="http://archive.trisquel.info/trisquel/pool/main/f/firefox/"
-TAR_NAME="firefox_63.0+build2-0ubuntu0.16.04.2+8.0trisquel59.tar.gz"
+TAR_NAME="firefox_64.0+build3-0ubuntu0.16.04.1+8.0trisquel60.tar.gz"
 BUILD_DIR=build
 
 # For building
 OBJ_DIR=objdir-droid
+
+# Notes:
+#    For new build on computer, run in terminal:
+#        rustup target add ARCH
+#    For x86/x86_64 target please install r17 manually from
+#        https://developer.android.com/ndk/downloads/
+#    and copy it to ~/.mozbuild
 ARCH=arm-linux-androideabi
+NDK_VER="r15c"
+
+# Uncomment for ARM64 build
+#ARCH=aarch64-linux-android
+#NDK_VER="r15c"
+
 # Uncomment for x86 build
-ARCH=i386-linux-android
+#ARCH=i686-linux-android
+#NDK_VER="r17c"
+
+# Uncomment for x86_64 build
+#ARCH=x86_64-linux-android
+#NDK_VER="r17c"
+
+# For `make`
+CPU_CORES=6
 
 if [ ! -d $BUILD_DIR ]; then
 	mkdir $BUILD_DIR
@@ -59,6 +83,14 @@ do
 	patch -Np1 -i $p
 done
 
+# Fix branding
+# (temporarily before applying patch
+# https://devel.trisquel.info/trisquel/package-helpers/merge_requests/213)
+
+cp -a ../patches/branding/res/* mobile/android/branding/official/res/
+
+# End fix branding
+
 ./mach bootstrap
 
 # Mozconfig
@@ -71,7 +103,7 @@ ac_add_options --target=$ARCH
 
 # With the following Android SDK and NDK:
 ac_add_options --with-android-sdk="$HOME/.mozbuild/android-sdk-linux"
-ac_add_options --with-android-ndk="$HOME/.mozbuild/android-ndk-r15c"
+ac_add_options --with-android-ndk="$HOME/.mozbuild/android-ndk-$NDK_VER"
 
 # Write build artifacts to:
 mk_add_options MOZ_OBJDIR="./$OBJ_DIR"
@@ -79,15 +111,29 @@ mk_add_options MOZ_OBJDIR="./$OBJ_DIR"
 # Build options
 ac_add_options --enable-official-branding
 ac_add_options --with-distribution-id=org.gnu
-ac_add_options --disable-elf-hack
 ac_add_options --enable-warnings-as-errors
 ac_add_options --enable-dump-painting
 
 # Use ccache
 ac_add_options --with-ccache
-# Your CPU cores + 1
-mk_add_options MOZ_MAKE_FLAGS=-j7
+mk_add_options MOZ_MAKE_FLAGS=-j$(($CPU_CORES + 1))
 
 END
+
+if [ $ARCH != "aarch64-linux-android" ]; then
+cat <<EOT >> mozconfig
+# Remove for ARM64
+ac_add_options --disable-elf-hack
+
+EOT
+fi
+
+if [[ $NDK_VER == *"r17"* ]]; then
+cat <<EOT >> mozconfig
+# For NDK r17
+export LDFLAGS="-Wno-error=tautological-constant-compare"
+
+EOT
+fi
 
 ./mach build && ./mach package
