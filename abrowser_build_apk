@@ -24,71 +24,79 @@
 #  2. Run script, source tarball will be downloaded and
 #     unpacked automatically.
 #  3. Follow the steps of the build system; choose
-#     "3. Abrowser for Android Artifact Mode" when prompted.
+#     "3. GeckoView/Abrowser for Android Artifact Mode" when prompted.
 #  4. Generated APK will be located in BUILD_DIR/obj-droid/dist.
 
 BASE_URL="http://archive.trisquel.info/trisquel/pool/main/f/firefox/"
-TAR_NAME="firefox_64.0+build3-0ubuntu0.16.04.1+8.0trisquel60.tar.gz"
+TAR_NAME="firefox_66.0.2+build1-0ubuntu0.16.04.1+8.0trisquel61.tar.gz"
 BUILD_DIR=build
-
-# For building
-OBJ_DIR=objdir-droid
+# For `make`
+CPU_CORES=6
 
 # Notes:
 #    For new build on computer, run in terminal:
 #        rustup target add ARCH
 #    For x86/x86_64 target please install r17 manually from
 #        https://developer.android.com/ndk/downloads/
-#    and copy it to ~/.mozbuild
-ARCH=arm-linux-androideabi
-NDK_VER="r15c"
+#    and copy it to .mozbuild
+
+# Uncomment for ARM build
+# ARCH=arm-linux-androideabi
+# NDK_VER="r15c"
 
 # Uncomment for ARM64 build
-#ARCH=aarch64-linux-android
-#NDK_VER="r15c"
+# ARCH=aarch64-linux-android
+# NDK_VER="r15c"
 
 # Uncomment for x86 build
-#ARCH=i686-linux-android
-#NDK_VER="r17c"
+# ARCH=i686-linux-android
+# NDK_VER="r17c"
 
 # Uncomment for x86_64 build
-#ARCH=x86_64-linux-android
-#NDK_VER="r17c"
+ARCH=x86_64-linux-android
+NDK_VER="r17c"
 
-# For `make`
-CPU_CORES=6
+# For building
+OBJ_DIR=objdir-droid
+
+#==============================================================#
 
 if [ ! -d $BUILD_DIR ]; then
 	mkdir $BUILD_DIR
 	wget "$BASE_URL$TAR_NAME" && \
 	tar zxf $TAR_NAME -C $BUILD_DIR --strip-components 1 && \
 	rm $TAR_NAME
+
+	cd $BUILD_DIR
+
+	# Patches
+	for p in debian/patches/*
+	do
+		patch -Np1 -i $p
+	done
+
+	for p in ../patches/*
+	do
+		patch -Np1 -i $p
+	done
+
+	# Fix branding
+	# (temporarily before applying patch
+	# https://devel.trisquel.info/trisquel/package-helpers/merge_requests/213)
+
+	cp -a ../patches/branding/res/* mobile/android/branding/official/res/
+
+	# End fix branding
+
+	cd ..
 fi
+
 cd $BUILD_DIR
 
 # Remove previous build
 if [ -d $OBJ_DIR ]; then
 	rm -rf $OBJ_DIR
 fi
-
-# Patches
-for p in debian/patches/*
-do
-	patch -Np1 -i $p
-done
-
-for p in ../patches/*
-do
-	patch -Np1 -i $p
-done
-
-# Fix branding
-# (temporarily before applying patch
-# https://devel.trisquel.info/trisquel/package-helpers/merge_requests/213)
-
-cp -a ../patches/branding/res/* mobile/android/branding/official/res/
-
-# End fix branding
 
 ./mach bootstrap
 
@@ -110,7 +118,6 @@ mk_add_options MOZ_OBJDIR="./$OBJ_DIR"
 # Build options
 ac_add_options --enable-official-branding
 ac_add_options --with-distribution-id=org.gnu
-ac_add_options --enable-warnings-as-errors
 ac_add_options --enable-dump-painting
 
 # Use ccache
