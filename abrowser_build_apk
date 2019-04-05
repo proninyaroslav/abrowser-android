@@ -41,8 +41,8 @@ CPU_CORES=6
 #    and copy it to .mozbuild
 
 # Uncomment for ARM build
-# ARCH=arm-linux-androideabi
-# NDK_VER="r15c"
+ ARCH=arm-linux-androideabi
+ NDK_VER="r15c"
 
 # Uncomment for ARM64 build
 # ARCH=aarch64-linux-android
@@ -53,8 +53,8 @@ CPU_CORES=6
 # NDK_VER="r17c"
 
 # Uncomment for x86_64 build
-ARCH=x86_64-linux-android
-NDK_VER="r17c"
+#ARCH=x86_64-linux-android
+#NDK_VER="r17c"
 
 # For building
 OBJ_DIR=objdir-droid
