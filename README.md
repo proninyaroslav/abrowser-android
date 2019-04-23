@@ -1,6 +1,8 @@
 Abrowser for Android
 =====================
 
+![Abrowser for Android](art/icon.png)
+
 [<img alt="Get it on F-Droid Unofficial" height="80" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png">](https://gitlab.com/rfc2822/fdroid-firefox)
 [<img alt="Get it on AFH" height="80" src="https://tachibanagenerallaboratories.github.io/images/badges/Android%20File%20Host/android-file-host-badge.png">](https://www.androidfilehost.com/?w=files&flid=292510)
 
