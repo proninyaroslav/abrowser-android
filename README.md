@@ -1,7 +1,8 @@
 Abrowser for Android
 =====================
 
-[<img alt="Get it on AFH" height="80" width="207" src="https://www.androidfilehost.com/images/afh.png">](https://www.androidfilehost.com/?w=files&flid=292510)
+[<img alt="Get it on F-Droid Unofficial" height="80" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png">](https://gitlab.com/rfc2822/fdroid-firefox)
+[<img alt="Get it on AFH" height="80" src="https://tachibanagenerallaboratories.github.io/images/badges/Android%20File%20Host/android-file-host-badge.png">](https://www.androidfilehost.com/?w=files&flid=292510)
 
 Android version of Abrowser - GNU Trisquel's version of Firefox [https://trisquel.info/en/wiki/abrowser-help](https://trisquel.info/en/wiki/abrowser-help).
 Abrowser, other that saner default settings to improve privacy, is pretty much Firefox and should provide a quite "neutral" browsing experience.
