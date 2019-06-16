@@ -28,7 +28,7 @@
 #  4. Generated APK will be located in BUILD_DIR/obj-droid/dist.
 
 BASE_URL="http://archive.trisquel.info/trisquel/pool/main/f/firefox/"
-TAR_NAME="firefox_66.0.3+build1-0ubuntu0.16.04.1+8.0trisquel61.tar.gz"
+TAR_NAME="firefox_67.0+build2-0ubuntu0.16.04.1+8.0trisquel62.tar.gz"
 BUILD_DIR=build
 # For `make`
 CPU_CORES=6
@@ -118,7 +118,7 @@ mk_add_options MOZ_OBJDIR="./$OBJ_DIR"
 # Build options
 ac_add_options --enable-official-branding
 ac_add_options --with-distribution-id=org.gnu
-ac_add_options --disable-eme
+#ac_add_options --disable-eme
 ac_add_options --disable-tests
 ac_add_options --disable-debug
 ac_add_options --disable-updater
